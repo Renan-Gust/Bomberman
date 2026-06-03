@@ -10,14 +10,16 @@ import (
 const (
 	MapHeight                     = 11
 	MapWidth                      = 17
-	PercentageOfDestructibleTiles = 0.75 // 75% from free floors(95)
 	TilePixels                    = 32
+	PercentageOfDestructibleTiles = 0.75 // 75% of the free tiles(95)
+	PercentageOfDroppableItem     = 0.17 // 17% of destructible tiles are droppable items
 )
 
 const (
 	IndestructibleTile = iota // 0
 	FreeTile                  // 1
 	DestructibleTile          // 2
+	DroppableItem             // 3
 )
 
 type Map struct{
@@ -27,7 +29,6 @@ type Map struct{
 type Point struct{ X, Y int }
 
 func(m *Map) GenerateMap() *Map{
-    // var destructibleWallPositions []Point
 	var freeTiles []Point
 
 	for x := range m.Grid {
@@ -60,8 +61,8 @@ func(m *Map) GenerateMap() *Map{
 		}
 	}
 
-	freeFloorsTotal := len(freeTiles)
-	destructibleTilesTotal := int(float32(freeFloorsTotal) * PercentageOfDestructibleTiles)
+	freeTilesTotal := len(freeTiles)
+	destructibleTilesTotal := int(float32(freeTilesTotal) * PercentageOfDestructibleTiles) // total of 71 tiles
 
 	shuffle(freeTiles)
 	
@@ -70,16 +71,13 @@ func(m *Map) GenerateMap() *Map{
 	for _, pos := range destructibleTiles{
 		m.Grid[pos.X][pos.Y] = DestructibleTile // (Blue)
 	}
-	
-	// fmt.Println(destructibleWalls)
-	// fmt.Println("\n")
-	// fmt.Println(shuffle(freeFloors))
 
-	// destructibleWallPositionsLength := len(destructibleWallPositions) - 1
-	// fmt.Println(destructibleWallPositionsLength)
-	// for i := 0; i <= 12; i++ {
-	// 	random := rand.Int32N(destructibleWallPositionsLength)
-	// }
+	droppableItemsTotal := int(float32(destructibleTilesTotal) * PercentageOfDroppableItem) // total of 12 tiles
+	droppableItems := destructibleTiles[:droppableItemsTotal]
+
+	for _, pos := range droppableItems{
+		m.Grid[pos.X][pos.Y] = DroppableItem // (Yellow)
+	}
 
 	return m
 }
@@ -102,7 +100,7 @@ func (m *Map) DrawMap(screen *ebiten.Image) *Map{
 				tileColor = red
 			} else if tile == DestructibleTile {
 				tileColor = blue
-			} else if tile == 3 {
+			} else if tile == DroppableItem {
 				tileColor = yellow
 			}
 
