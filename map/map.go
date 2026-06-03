@@ -11,15 +11,14 @@ const (
 	MapHeight                     = 11
 	MapWidth                      = 17
 	TilePixels                    = 32
-	PercentageOfDestructibleTiles = 0.75 // 75% of the free tiles(95)
-	PercentageOfDroppableItem     = 0.17 // 17% of destructible tiles are droppable items
+	percentageOfDestructibleTiles = 0.75 // 75% of the free tiles(95)
+	percentageOfDroppableItem     = 0.17 // 17% of destructible tiles are droppable items
 )
 
 const (
 	IndestructibleTile = iota // 0
 	FreeTile                  // 1
 	DestructibleTile          // 2
-	DroppableItem             // 3
 )
 
 type Map struct{
@@ -47,14 +46,6 @@ func(m *Map) GenerateMap() *Map{
             } else if spawnAreas {
 				m.Grid[x][y] = FreeTile // (Green)
 			} else {
-                // if rand.Float32() < DestructibleRatio {
-				// 	m.Grid[x][y] = DestructibleWall // (Blue)
-
-				// 	destructibleWallPositions = append(destructibleWallPositions, Point{X: x, Y: y})
-				// } else {
-				// 	m.Grid[x][y] = FreeFloor // The remaining 25% stays as free floor (Green)
-				// }
-
 				m.Grid[x][y] = FreeTile 
 				freeTiles = append(freeTiles, Point{X: x, Y: y}) // total of 95 tiles
             }
@@ -62,7 +53,7 @@ func(m *Map) GenerateMap() *Map{
 	}
 
 	freeTilesTotal := len(freeTiles)
-	destructibleTilesTotal := int(float32(freeTilesTotal) * PercentageOfDestructibleTiles) // total of 71 tiles
+	destructibleTilesTotal := int(float32(freeTilesTotal) * percentageOfDestructibleTiles) // total of 71 tiles
 
 	shuffle(freeTiles)
 	
@@ -72,12 +63,10 @@ func(m *Map) GenerateMap() *Map{
 		m.Grid[pos.X][pos.Y] = DestructibleTile // (Blue)
 	}
 
-	droppableItemsTotal := int(float32(destructibleTilesTotal) * PercentageOfDroppableItem) // total of 12 tiles
+	droppableItemsTotal := int(float32(destructibleTilesTotal) * percentageOfDroppableItem) // total of 12 tiles
 	droppableItems := destructibleTiles[:droppableItemsTotal]
 
-	for _, pos := range droppableItems{
-		m.Grid[pos.X][pos.Y] = DroppableItem // (Yellow)
-	}
+	generateDroppableItems(m, droppableItems)
 
 	return m
 }
@@ -86,7 +75,6 @@ func (m *Map) DrawMap(screen *ebiten.Image) *Map{
 	red := color.RGBA{255, 0, 0, 255}
 	green := color.RGBA{34, 139, 34, 255}
 	blue := color.RGBA{0, 0, 255, 255}
-	yellow := color.RGBA{255, 255, 0, 255}
 
 	for x := range m.Grid {
 		for y := range m.Grid[x] {
@@ -100,13 +88,30 @@ func (m *Map) DrawMap(screen *ebiten.Image) *Map{
 				tileColor = red
 			} else if tile == DestructibleTile {
 				tileColor = blue
-			} else if tile == DroppableItem {
-				tileColor = yellow
 			}
+
+			tileColor = fillItems(tile)
 
 			vector.FillRect(screen, posX, posY, TilePixels, TilePixels, tileColor, true)
 		}
 	}
 
 	return m
+}
+
+func fillItems(tile int) color.RGBA{
+	yellow50 := color.RGBA{255, 255, 0, 50}
+	yellow100 := color.RGBA{255, 255, 0, 100}
+	yellow150 := color.RGBA{255, 255, 0, 150}
+
+	switch tile {
+	case SpeedItem:
+		return yellow50
+	case FireItem:
+		return yellow100
+	case BombItem:
+		return yellow150
+	}
+
+	return yellow100
 }
