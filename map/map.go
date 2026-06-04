@@ -88,9 +88,9 @@ func (m *Map) DrawMap(screen *ebiten.Image) *Map{
 				tileColor = red
 			} else if tile == DestructibleTile {
 				tileColor = blue
+			} else {
+				tileColor = itemColor(tile)
 			}
-
-			tileColor = fillItems(tile)
 
 			vector.FillRect(screen, posX, posY, TilePixels, TilePixels, tileColor, true)
 		}
@@ -99,19 +99,15 @@ func (m *Map) DrawMap(screen *ebiten.Image) *Map{
 	return m
 }
 
-func fillItems(tile int) color.RGBA{
-	yellow50 := color.RGBA{255, 255, 0, 50}
-	yellow100 := color.RGBA{255, 255, 0, 100}
-	yellow150 := color.RGBA{255, 255, 0, 150}
-
+func itemColor(tile int) color.RGBA{
 	switch tile {
 	case SpeedItem:
-		return yellow50
+		return color.RGBA{255, 255, 0, 255} // Amarelo
 	case FireItem:
-		return yellow100
+		return color.RGBA{255, 0, 255, 255} // Magenta
 	case BombItem:
-		return yellow150
+		return color.RGBA{128, 0, 128, 255} // Roxo
+	default:
+		return color.RGBA{34, 139, 34, 255} // Green (Free Tile)
 	}
-
-	return yellow100
 }
