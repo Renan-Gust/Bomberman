@@ -4,8 +4,6 @@ import (
 	"math/rand/v2"
 )
 
-type test struct{ percentage, limit float32 }
-
 const (
 	essentialItems      = 0.50 // 50% of droppable items are essential type
 	// Only 50% of the essentials items can be repeated
@@ -38,12 +36,21 @@ var essentialItemsList = []int{SpeedItem, FireItem, BombItem}
 var specialItemsList = []int{HeartItem, ShieldItem, BombPassItem}
 var negativeItemsList = []int{SlownessItem, HyperSpeedItem, ShortFuseItem, ReverseControlItem}
 
+var remainingDroppableItems []Point
+
 func generateDroppableItems(m *Map, droppableItems []Point){
+	generateEssentialItems(m, droppableItems)
+	generateSpecialItems(m, droppableItems)
+}
+
+func generateEssentialItems(m *Map, droppableItems []Point){
 	droppableItemsTotal := len(droppableItems)
 
 	essentialItemsTotal := int(float32(droppableItemsTotal) * essentialItems) // total of 6 tiles
 	repetitionLimit := int(float32(essentialItemsTotal) * essentialItemsLimit)
+
 	essentialItems := droppableItems[:essentialItemsTotal]
+	remainingDroppableItems = droppableItems[essentialItemsTotal:]
 
 	countRepeatedItems := make(map[int]int)
 
@@ -61,5 +68,33 @@ func generateDroppableItems(m *Map, droppableItems []Point){
 
 			break
 		}	
+	}
+}
+
+func generateSpecialItems(m *Map, droppableItems []Point){
+	droppableItemsTotal := len(droppableItems)
+
+	specialItemsTotal := int(float32(droppableItemsTotal) * specialItems) // total of 3 tiles
+
+	// repetitionLimit := int(float32(essentialItemsTotal) * essentialItemsLimit)
+	specialItems := remainingDroppableItems[:specialItemsTotal]
+	remainingDroppableItems = remainingDroppableItems[specialItemsTotal:]
+
+	// countRepeatedItems := make(map[int]int)
+
+	for _, pos := range specialItems{
+		// for {
+			index := rand.IntN(len(specialItemsList))
+			item := specialItemsList[index]
+
+			// if countRepeatedItems[item] >= repetitionLimit {
+			// 	continue
+			// }
+
+			// countRepeatedItems[item]++
+			m.Grid[pos.X][pos.Y] = item
+
+			// break
+		// }
 	}
 }

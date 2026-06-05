@@ -101,12 +101,21 @@ func (m *Map) DrawMap(screen *ebiten.Image) *Map{
 
 func itemColor(tile int) color.RGBA{
 	switch tile {
+	// Essential items
 	case SpeedItem:
 		return color.RGBA{255, 255, 0, 255} // Amarelo
 	case FireItem:
 		return color.RGBA{255, 0, 255, 255} // Magenta
 	case BombItem:
 		return color.RGBA{128, 0, 128, 255} // Roxo
+	
+	// Special items 
+	case HeartItem:
+		return color.RGBA{101, 67, 33, 255} // Marrom
+	case ShieldItem:
+		return color.RGBA{211, 211, 211, 255} // Cinza
+	case BombPassItem:
+		return color.RGBA{255, 255, 255, 255} // Branco
 	default:
 		return color.RGBA{34, 139, 34, 255} // Green (Free Tile)
 	}
