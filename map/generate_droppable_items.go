@@ -1,7 +1,6 @@
 package gmap
 
 import (
-	"fmt"
 	"math/rand/v2"
 )
 
@@ -34,7 +33,17 @@ const (
 )
 
 var essentialItemsList = []int{SpeedItem, FireItem, BombItem}
-var specialItemsList = []int{HeartItem, ShieldItem, BombPassItem}
+
+type specialItemsRules struct {
+	chance float32
+	limit int
+}
+var specialItemsList = map[int]specialItemsRules{
+	HeartItem: { chance: 0.40, limit: 2 },
+	ShieldItem: { chance: 0.40, limit: 2 },
+	BombPassItem: { chance: 0.20, limit: 1 },
+}
+
 var negativeItemsList = []int{SlownessItem, HyperSpeedItem, ShortFuseItem, ReverseControlItem}
 
 var remainingDroppableItems []Point
@@ -76,46 +85,36 @@ func generateSpecialItems(m *Map, droppableItems []Point){
 	droppableItemsTotal := len(droppableItems)
 
 	specialItemsTotal := int(float32(droppableItemsTotal) * specialItems) // total of 3 tiles
-	// repetitionLimit := int(float32(essentialItemsTotal) * essentialItemsLimit)
 
 	specialItems := remainingDroppableItems[:specialItemsTotal]
 	remainingDroppableItems = remainingDroppableItems[specialItemsTotal:]
 
 	countRepeatedItems := make(map[int]int)
-	var test []int
 
-	for _, pos := range specialItems{
+	for _, pos := range specialItems {
 		for {
-			random := rand.IntN(100)
+			random := rand.Float32()
 
-			if random > 0 && random <= 20 {
-				if countRepeatedItems[BombPassItem] >= 1 {
-					continue
-				}
+			var sortedItem int
+            var accumulated float32
 
-				countRepeatedItems[BombPassItem]++
-				m.Grid[pos.X][pos.Y] = BombPassItem
-				test = append(test, BombPassItem)
+            for id, rule := range specialItemsList {
+                accumulated += rule.chance
+                if random <= accumulated {
+                    sortedItem = id
+                    break
+                }
+            }
 
-				break
-			} else {
-				index := rand.IntN(len(specialItemsList) - 1) // All special items less the bomb pass
-				item := specialItemsList[index]
+			itemRule := specialItemsList[sortedItem]
+			if countRepeatedItems[sortedItem] >= itemRule.limit {
+                continue
+            }
 
-				fmt.Println(item)
+            countRepeatedItems[sortedItem]++
+            m.Grid[pos.X][pos.Y] = sortedItem
 
-				if countRepeatedItems[item] >= 2 {
-					continue
-				}
-
-				countRepeatedItems[item]++
-				m.Grid[pos.X][pos.Y] = item
-				test = append(test, item)
-
-				break
-			}
+            break
 		}
 	}
-
-	fmt.Println(test)
 }
