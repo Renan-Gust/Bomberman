@@ -1,6 +1,7 @@
 package gmap
 
 import (
+	"fmt"
 	"math/rand/v2"
 )
 
@@ -75,26 +76,46 @@ func generateSpecialItems(m *Map, droppableItems []Point){
 	droppableItemsTotal := len(droppableItems)
 
 	specialItemsTotal := int(float32(droppableItemsTotal) * specialItems) // total of 3 tiles
-
 	// repetitionLimit := int(float32(essentialItemsTotal) * essentialItemsLimit)
+
 	specialItems := remainingDroppableItems[:specialItemsTotal]
 	remainingDroppableItems = remainingDroppableItems[specialItemsTotal:]
 
-	// countRepeatedItems := make(map[int]int)
+	countRepeatedItems := make(map[int]int)
+	var test []int
 
 	for _, pos := range specialItems{
-		// for {
-			index := rand.IntN(len(specialItemsList))
-			item := specialItemsList[index]
+		for {
+			random := rand.IntN(100)
 
-			// if countRepeatedItems[item] >= repetitionLimit {
-			// 	continue
-			// }
+			if random > 0 && random <= 20 {
+				if countRepeatedItems[BombPassItem] >= 1 {
+					continue
+				}
 
-			// countRepeatedItems[item]++
-			m.Grid[pos.X][pos.Y] = item
+				countRepeatedItems[BombPassItem]++
+				m.Grid[pos.X][pos.Y] = BombPassItem
+				test = append(test, BombPassItem)
 
-			// break
-		// }
+				break
+			} else {
+				index := rand.IntN(len(specialItemsList) - 1) // All special items less the bomb pass
+				item := specialItemsList[index]
+
+				fmt.Println(item)
+
+				if countRepeatedItems[item] >= 2 {
+					continue
+				}
+
+				countRepeatedItems[item]++
+				m.Grid[pos.X][pos.Y] = item
+				test = append(test, item)
+
+				break
+			}
+		}
 	}
+
+	fmt.Println(test)
 }
