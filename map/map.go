@@ -105,17 +105,27 @@ func itemColor(tile int) color.RGBA{
 	case SpeedItem:
 		return color.RGBA{255, 255, 0, 255} // Amarelo
 	case FireItem:
-		return color.RGBA{255, 0, 255, 255} // Magenta
+		return color.RGBA{255, 255, 0, 255} //color.RGBA{255, 0, 255, 255} // Magenta
 	case BombItem:
-		return color.RGBA{128, 0, 128, 255} // Roxo
+		return color.RGBA{255, 255, 0, 255} //color.RGBA{128, 0, 128, 255} // Roxo
 	
 	// Special items 
 	case HeartItem:
-		return color.RGBA{101, 67, 33, 255} // Marrom
+		return color.RGBA{255, 255, 255, 255} //color.RGBA{101, 67, 33, 255} // Marrom
 	case ShieldItem:
-		return color.RGBA{211, 211, 211, 255} // Cinza
+		return color.RGBA{255, 255, 255, 255} //color.RGBA{211, 211, 211, 255} // Cinza
 	case BombPassItem:
 		return color.RGBA{255, 255, 255, 255} // Branco
+
+	// Negative items 
+	case SlownessItem:
+		return color.RGBA{0, 0, 0, 255} // Preto
+	case HyperSpeedItem:
+		return color.RGBA{0, 0, 0, 255} // Preto
+	case ShortFuseItem:
+		return color.RGBA{0, 0, 0, 255} // Preto		
+	case ReverseControlItem:
+		return color.RGBA{0, 0, 0, 255} // Preto
 	default:
 		return color.RGBA{34, 139, 34, 255} // Green (Free Tile)
 	}
