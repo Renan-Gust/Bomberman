@@ -27,7 +27,7 @@ type Map struct{
 
 type Point struct{ X, Y int }
 
-func(m *Map) GenerateMap() *Map{
+func(m *Map) Generate(){
 	var freeTiles []Point
 
 	for x := range m.Grid {
@@ -67,11 +67,9 @@ func(m *Map) GenerateMap() *Map{
 	droppableItems := destructibleTiles[:droppableItemsTotal]
 
 	generateDroppableItems(m, droppableItems)
-
-	return m
 }
 
-func (m *Map) DrawMap(screen *ebiten.Image) *Map{
+func (m *Map) Draw(screen *ebiten.Image){
 	red := color.RGBA{255, 0, 0, 255}
 	green := color.RGBA{34, 139, 34, 255}
 	blue := color.RGBA{0, 0, 255, 255}
@@ -95,8 +93,6 @@ func (m *Map) DrawMap(screen *ebiten.Image) *Map{
 			vector.FillRect(screen, posX, posY, TilePixels, TilePixels, tileColor, true)
 		}
 	}
-
-	return m
 }
 
 func itemColor(tile int) color.RGBA{
