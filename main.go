@@ -16,7 +16,7 @@ type Game struct{
 }
 
 func (g *Game) Update() error {
-	g.Player.MovePlayer()
+	g.Player.Move()
 	return nil
 }
 

@@ -54,3 +54,7 @@ const (
 	FrameStartWidth = iota
 	FrameEndWidth   = 24
 )
+
+const (
+	DefaultSpeed = 2.0
+)

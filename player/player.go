@@ -32,9 +32,10 @@ const (
 )
 
 type Player struct {
-	SpriteSheet  *ebiten.Image
-	X, Y         float64
-	CurrentFrame int
+	SpriteSheet                   *ebiten.Image
+	X, Y, TargetX, TargetY, Speed float64
+	CurrentFrame                  int
+	Walking                       bool
 }
 
 func(p *Player) Launcher(){
@@ -44,6 +45,7 @@ func(p *Player) Launcher(){
 	}
 
 	p.SpriteSheet = ebiten.NewImageFromImage(img)
+	p.Speed = config.DefaultSpeed
 }
 
 func(p *Player) Draw(screen *ebiten.Image){
@@ -61,7 +63,6 @@ func(p *Player) Draw(screen *ebiten.Image){
 
 	rect := image.Rect(x0, y0, x1, y1)
     subImg := p.SpriteSheet.SubImage(rect).(*ebiten.Image)
-
 	op := &ebiten.DrawImageOptions{}
 
     if p.X == 0 && p.Y == 0 {
@@ -73,34 +74,53 @@ func(p *Player) Draw(screen *ebiten.Image){
     screen.DrawImage(subImg, op)
 }
 
-func(p *Player) MovePlayer() {
-	if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-		if p.X > 0 + 32 {
-			p.CurrentFrame = left0
-			p.X -= config.TilePixels
+func(p *Player) Move() {
+	if !p.Walking {
+		if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+			if p.X > config.TilePixels {
+				p.TargetX = p.X - config.TilePixels
+				p.CurrentFrame = left0
+				p.Walking = true
+			}
 		}
 
-		fmt.Println(p.X, p.Y)
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-		fmt.Println("W/up")
-	}
-	
-	if ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-		fmt.Println("S/down")
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-
-		if p.X < (544 - (32 * 2)) {
-			p.CurrentFrame = right0
-			p.X += config.TilePixels
-			
+		if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+			fmt.Println("W/up")
 		}
-
-		fmt.Println(p.X, p.Y)
-
 		
+		if ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+			fmt.Println("S/down")
+		}
+
+		if ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+			if p.X < (config.ScreenWidth - (config.TilePixels * 2)) {
+				p.TargetX = p.X + config.TilePixels
+				p.CurrentFrame = right0
+				p.Walking = true
+			}
+		}
+	} else {
+		if p.X < p.TargetX {
+			p.X += p.Speed
+
+			if p.X >= p.TargetX {
+				p.X = p.TargetX
+			}
+		}
+
+		if p.X > p.TargetX {
+			p.X -= p.Speed
+
+			if p.X <= p.TargetX {
+				p.X = p.TargetX
+			}
+		}
+		
+		// Faça a mesma lógica acima para o p.Y e p.AlvoY!
+
+		// && p.Y == p.TargetY
+		if p.X == p.TargetX {
+			p.Walking = false
+		}
 	}
 }
