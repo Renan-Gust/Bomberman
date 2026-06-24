@@ -1,28 +1,15 @@
 package gmap
 
 import (
+	"bomberman/config"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-const (
-	MapHeight                     = 11
-	MapWidth                      = 17
-	TilePixels                    = 32
-	percentageOfDestructibleTiles = 0.75 // 75% of the free tiles(95)
-	percentageOfDroppableItem     = 0.17 // 17% of destructible tiles are droppable items
-)
-
-const (
-	IndestructibleTile = iota // 0
-	FreeTile                  // 1
-	DestructibleTile          // 2
-)
-
 type Map struct{
-	Grid [MapHeight][MapWidth]int // total of 187 tiles
+	Grid [config.MapHeight][config.MapWidth]int // total of 187 tiles
 }
 
 type Point struct{ X, Y int }
@@ -42,28 +29,28 @@ func(m *Map) Generate(){
 			spawnAreas := topRows || bottomRows || verticalExtensions // total of 12 tiles
 
 			if borders || indestructibleTiles {
-                m.Grid[x][y] = IndestructibleTile // (Red)
+                m.Grid[x][y] = config.IndestructibleTile // (Red)
             } else if spawnAreas {
-				m.Grid[x][y] = FreeTile // (Green)
+				m.Grid[x][y] = config.FreeTile // (Green)
 			} else {
-				m.Grid[x][y] = FreeTile 
+				m.Grid[x][y] = config.FreeTile 
 				freeTiles = append(freeTiles, Point{X: x, Y: y}) // total of 95 tiles
             }
 		}
 	}
 
 	freeTilesTotal := len(freeTiles)
-	destructibleTilesTotal := int(float32(freeTilesTotal) * percentageOfDestructibleTiles) // total of 71 tiles
+	destructibleTilesTotal := int(float32(freeTilesTotal) * config.PercentageOfDestructibleTiles) // total of 71 tiles
 
 	shuffle(freeTiles)
 	
 	destructibleTiles := freeTiles[:destructibleTilesTotal]
 
 	for _, pos := range destructibleTiles{
-		m.Grid[pos.X][pos.Y] = DestructibleTile // (Blue)
+		m.Grid[pos.X][pos.Y] = config.DestructibleTile // (Blue)
 	}
 
-	droppableItemsTotal := int(float32(destructibleTilesTotal) * percentageOfDroppableItem) // total of 12 tiles
+	droppableItemsTotal := int(float32(destructibleTilesTotal) * config.PercentageOfDroppableItem) // total of 12 tiles
 	droppableItems := destructibleTiles[:droppableItemsTotal]
 
 	generateDroppableItems(m, droppableItems)
@@ -76,21 +63,21 @@ func (m *Map) Draw(screen *ebiten.Image){
 
 	for x := range m.Grid {
 		for y := range m.Grid[x] {
-			posX := float32(y * TilePixels)
-			posY := float32(x * TilePixels)
+			posX := float32(y * config.TilePixels)
+			posY := float32(x * config.TilePixels)
 
 			tile := m.Grid[x][y]
 			tileColor := green
 
-			if tile == IndestructibleTile {
+			if tile == config.IndestructibleTile {
 				tileColor = red
-			} else if tile == DestructibleTile {
+			} else if tile == config.DestructibleTile {
 				tileColor = blue
 			} else {
 				tileColor = itemColor(tile)
 			}
 
-			vector.FillRect(screen, posX, posY, TilePixels, TilePixels, tileColor, true)
+			vector.FillRect(screen, posX, posY, config.TilePixels, config.TilePixels, tileColor, true)
 		}
 	}
 }
@@ -98,29 +85,29 @@ func (m *Map) Draw(screen *ebiten.Image){
 func itemColor(tile int) color.RGBA{
 	switch tile {
 	// Essential items
-	case SpeedItem:
+	case config.SpeedItem:
 		return color.RGBA{255, 255, 0, 255} // Amarelo
-	case FireItem:
+	case config.FireItem:
 		return color.RGBA{255, 255, 0, 255} //color.RGBA{255, 0, 255, 255} // Magenta
-	case BombItem:
+	case config.BombItem:
 		return color.RGBA{255, 255, 0, 255} //color.RGBA{128, 0, 128, 255} // Roxo
 	
 	// Special items 
-	case HeartItem:
+	case config.HeartItem:
 		return color.RGBA{255, 255, 255, 255} //color.RGBA{101, 67, 33, 255} // Marrom
-	case ShieldItem:
+	case config.ShieldItem:
 		return color.RGBA{255, 255, 255, 255} //color.RGBA{211, 211, 211, 255} // Cinza
-	case BombPassItem:
+	case config.BombPassItem:
 		return color.RGBA{255, 255, 255, 255} // Branco
 
 	// Negative items 
-	case SlownessItem:
+	case config.SlownessItem:
 		return color.RGBA{0, 0, 0, 255} // Preto
-	case HyperSpeedItem:
+	case config.HyperSpeedItem:
 		return color.RGBA{0, 0, 0, 255} // Preto
-	case ShortFuseItem:
+	case config.ShortFuseItem:
 		return color.RGBA{0, 0, 0, 255} // Preto		
-	case ReverseControlItem:
+	case config.ReverseControlItem:
 		return color.RGBA{0, 0, 0, 255} // Preto
 	default:
 		return color.RGBA{34, 139, 34, 255} // Green (Free Tile)

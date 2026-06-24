@@ -1,51 +1,24 @@
 package gmap
 
 import (
+	"bomberman/config"
 	"math"
 	"math/rand/v2"
 )
 
-const (
-	essentialItems      = 0.50 // 50% of droppable items are essential type
-	// Only 50% of the essentials items can be repeated
-	// (Ex.: If the total of essential items is 6. It can only drop a maximum 3 fire items)
-	essentialItemsLimit = 0.50
-
-	specialItems   = 0.25  // 25% of droppable items are special type
-	negativeItems  = 0.25  // 25% of droppable items are negative type
-)
-
-const (
-	// Essential item (family 30-39)
-	SpeedItem = 30
-	FireItem  = 31
-	BombItem  = 32
-
-	// Special item (family 40-49)
-	HeartItem     = 40
-	ShieldItem    = 41
-	BombPassItem  = 42
-
-	// Negative item (family 50-59)
-	SlownessItem       = 50
-	HyperSpeedItem     = 51
-	ShortFuseItem      = 52
-	ReverseControlItem = 53
-)
-
-var essentialItemsList = []int{SpeedItem, FireItem, BombItem}
+var essentialItemsList = []int{config.SpeedItem, config.FireItem, config.BombItem}
 
 type specialItemsRules struct {
 	chance float32
 	limit int
 }
 var specialItemsList = map[int]specialItemsRules{
-	HeartItem: { chance: 0.40, limit: 2 },
-	ShieldItem: { chance: 0.40, limit: 2 },
-	BombPassItem: { chance: 0.20, limit: 1 },
+	config.HeartItem: { chance: 0.40, limit: 2 },
+	config.ShieldItem: { chance: 0.40, limit: 2 },
+	config.BombPassItem: { chance: 0.20, limit: 1 },
 }
 
-var negativeItemsList = []int{SlownessItem, HyperSpeedItem, ShortFuseItem, ReverseControlItem}
+var negativeItemsList = []int{config.SlownessItem, config.HyperSpeedItem, config.ShortFuseItem, config.ReverseControlItem}
 
 var remainingDroppableItems []Point
 
@@ -58,8 +31,8 @@ func generateDroppableItems(m *Map, droppableItems []Point){
 func generateEssentialItems(m *Map, droppableItems []Point){
 	droppableItemsTotal := len(droppableItems)
 
-	essentialItemsTotal := int(float32(droppableItemsTotal) * essentialItems) // total of 6 tiles
-	repetitionLimit := int(float32(essentialItemsTotal) * essentialItemsLimit)
+	essentialItemsTotal := int(float32(droppableItemsTotal) * config.EssentialItems) // total of 6 tiles
+	repetitionLimit := int(float32(essentialItemsTotal) * config.EssentialItemsLimit)
 
 	essentialItems := droppableItems[:essentialItemsTotal]
 	remainingDroppableItems = droppableItems[essentialItemsTotal:]
@@ -86,7 +59,7 @@ func generateEssentialItems(m *Map, droppableItems []Point){
 func generateSpecialItems(m *Map, droppableItems []Point){
 	droppableItemsTotal := len(droppableItems)
 
-	specialItemsTotal := int(float32(droppableItemsTotal) * specialItems) // total of 3 tiles
+	specialItemsTotal := int(float32(droppableItemsTotal) * config.SpecialItems) // total of 3 tiles
 	specialItems := remainingDroppableItems[:specialItemsTotal]
 	remainingDroppableItems = remainingDroppableItems[specialItemsTotal:]
 
@@ -123,7 +96,7 @@ func generateSpecialItems(m *Map, droppableItems []Point){
 func generateNegativeItems(m *Map, droppableItems []Point){
 	droppableItemsTotal := len(droppableItems)
 
-	negativeItemsTotal := int(float32(droppableItemsTotal) * negativeItems) // total of 3 tiles
+	negativeItemsTotal := int(float32(droppableItemsTotal) * config.NegativeItems) // total of 3 tiles
 	negativeItems := remainingDroppableItems[:negativeItemsTotal]
 	
 	negativeItemsListTotal := len(negativeItemsList)
