@@ -32,10 +32,9 @@ const (
 )
 
 type Player struct {
-	SpriteSheet                   *ebiten.Image
-	X, Y, TargetX, TargetY, Speed float64
-	CurrentFrame                  int
-	Walking                       bool
+	SpriteSheet *ebiten.Image
+	X, Y         float64
+	CurrentFrame int
 }
 
 func(p *Player) Launcher(){
@@ -45,7 +44,6 @@ func(p *Player) Launcher(){
 	}
 
 	p.SpriteSheet = ebiten.NewImageFromImage(img)
-	p.Speed = config.DefaultSpeed
 }
 
 func(p *Player) Draw(screen *ebiten.Image){
@@ -75,52 +73,29 @@ func(p *Player) Draw(screen *ebiten.Image){
 }
 
 func(p *Player) Move() {
-	if !p.Walking {
-		if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
-			if p.X > config.TilePixels {
-				p.TargetX = p.X - config.TilePixels
-				p.CurrentFrame = left0
-				p.Walking = true
-			}
+	if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		if p.X > config.TilePixels {
+			p.X -= config.DefaultSpeed
+			p.CurrentFrame = left0
 		}
+	}
 
-		if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-			fmt.Println("W/up")
-		}
-		
-		if ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
-			fmt.Println("S/down")
-		}
+	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		fmt.Println("W/up")
+	}
+	
+	if ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		fmt.Println("S/down")
+	}
 
-		if ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
-			if p.X < (config.ScreenWidth - (config.TilePixels * 2)) {
-				p.TargetX = p.X + config.TilePixels
+	if ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+		if p.X < (config.ScreenWidth - (config.TilePixels * 2)) {
+			p.X += config.DefaultSpeed
+			p.CurrentFrame += right0 + 1
+
+			if(p.CurrentFrame >= 5){
 				p.CurrentFrame = right0
-				p.Walking = true
 			}
-		}
-	} else {
-		if p.X < p.TargetX {
-			p.X += p.Speed
-
-			if p.X >= p.TargetX {
-				p.X = p.TargetX
-			}
-		}
-
-		if p.X > p.TargetX {
-			p.X -= p.Speed
-
-			if p.X <= p.TargetX {
-				p.X = p.TargetX
-			}
-		}
-		
-		// Faça a mesma lógica acima para o p.Y e p.AlvoY!
-
-		// && p.Y == p.TargetY
-		if p.X == p.TargetX {
-			p.Walking = false
 		}
 	}
 }
